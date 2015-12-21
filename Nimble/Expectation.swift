@@ -45,6 +45,19 @@ public struct Expectation<T> {
         verify(pass, msg)
     }
 
+    /// Tests the actual value using a matcher to match.
+    public func to<U where U: Matcher, U.ValueType == T>(matcher: U, description: String? = nil, beforeAndAfter update: () -> Void) {
+        let (pass, msg) = expressionMatches(expression, matcher: matcher, to: "to", description: description)
+        guard pass else {
+            verify(pass, msg)
+            return
+        }
+        
+        update()
+        
+        toEventually(matcher)
+    }
+    
     /// Tests the actual value using a matcher to not match.
     public func toNot<U where U: Matcher, U.ValueType == T>(matcher: U, description: String? = nil) {
         let (pass, msg) = expressionDoesNotMatch(expression, matcher: matcher, toNot: "to not", description: description)
